@@ -1,11 +1,16 @@
 
-main(){
+vladastos_libs(){
     local lib_name="$1"
-    local lib_path="lib/${lib_name}.bash"
+    echo "Using version 0.0.2"
+    echo "Loading library: $lib_name"
     shift
-    if [ ! -f "$lib_path" ]; then
-        echo "Library not found: $lib_path"
-        exit 1
+    local lib_path=https://raw.githubusercontent.com/Vladastos/bash_libraries/main/lib/$lib_name.bash
+    if ! wget -q --spider "$lib_path" &>/dev/null; then
+        echo "Library $lib_name not found"
+            return 1
     fi
-    source "$lib_path" "$@"
+    local lib=$(wget -qO- "$lib_path")
+    source <(echo "$lib")
+    "$lib_name" "$@"
 }
+
