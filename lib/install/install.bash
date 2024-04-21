@@ -49,6 +49,8 @@ install_dependencies() {
             elif [ "$dependency" == "nvim" ]; then
                 intall_dependencies "brew"
                 brew install neovim
+            elif [ "$dependency" == "startEnv" ]; then
+                
             else
                 bash -c "$INSTALL_COMMAND $dependency"
 
