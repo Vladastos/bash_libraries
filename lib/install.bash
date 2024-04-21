@@ -60,10 +60,9 @@ install_dependencies() {
     done
 }
 
-main() {
+install() {
     detect_package_manager
     construct_install_command
     install_dependencies "$@"
 }
 
-main "$@"

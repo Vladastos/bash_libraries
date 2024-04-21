@@ -1,6 +1,6 @@
 hello-world(){
     echo "Hello World"
     if [ "$#" -gt 0 ]; then
-        echo "Parameters: $@"
+        echo "Parameters: $*"
     fi
 }

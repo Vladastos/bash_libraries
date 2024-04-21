@@ -1,7 +1,7 @@
-
+#!/bin/bash
 vladastos_libs(){
     local lib_name="$1"
-    echo "Using version 0.0.2"
+    echo "Using version 0.0.3"
     echo "Loading library: $lib_name"
     shift
     local lib_path=https://raw.githubusercontent.com/Vladastos/bash_libraries/main/lib/$lib_name.bash
