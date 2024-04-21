@@ -47,10 +47,10 @@ install_dependencies() {
             if [ "$dependency" == "brew" ]; then
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             elif [ "$dependency" == "nvim" ]; then
-                intall_dependencies "brew"
+                install_dependencies "brew"
                 brew install neovim
             elif [ "$dependency" == "startEnv" ]; then
-                
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Vladastos/startEnv/main/setup.bash)"
             else
                 bash -c "$INSTALL_COMMAND $dependency"
 

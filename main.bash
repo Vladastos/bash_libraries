@@ -5,7 +5,7 @@ check_if_in_cache_and_execute(){
     mkdir -p "$CACHE_DIR"
     local lib_name="$1"
     shift
-    local lib_remote_path=https://raw.githubusercontent.com/Vladastos/bash_libraries/main/lib/$lib_name/$lib_name.bash
+    local lib_remote_path=https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/$lib_name/$lib_name.bash
     local lib_path="$CACHE_DIR"/"$lib_name".bash
     if [ ! -f "$lib_path" ]; then
         #if not in cache download
@@ -27,7 +27,7 @@ check_if_in_cache_and_execute(){
 parse_args(){
     for arg in "$@"; do
         if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]; then
-            echo "Usage: vladastos_libs <lib_name>"
+            echo "Usage: vlibs <lib_name>"
             echo "Options:"
             echo "  -h, --help          Show this help message"
             echo "  -v, --version       Show the version number"
@@ -45,9 +45,9 @@ parse_args(){
     done
     return
 }
-vladastos_libs(){
-    if [ "$#" -eq 0 ]; then
-        echo "Usage: vladastos_libs <lib_name>"
+execute_vlibs(){
+    if [ "$#" -eq 0 ] || [ "$1" == ""  ]; then
+        echo "Usage: vlibs <lib_name> [arguments]"
     fi
     parse_args "$@"
     if [ "$?" -eq 1 ]; then
