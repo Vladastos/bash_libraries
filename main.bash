@@ -23,11 +23,15 @@ check_if_in_cache_and_execute(){
     "$lib_name" "$@"
 
 }
+get_library_list(){
+    local library_list="hello-world install"
+    echo "$library_list"
+}
 
 parse_args(){
     for arg in "$@"; do
         if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]; then
-            echo "Usage: vlibs <lib_name>"
+            echo "Usage: vlibs [options] <lib_name> [arguments]"
             echo "Options:"
             echo "  -h, --help          Show this help message"
             echo "  -v, --version       Show the version number"
@@ -40,7 +44,7 @@ parse_args(){
             return 1
         fi
         if [ "$arg" == "-l" ] || [ "$arg" == "--list" ]; then
-            echo "hello-world install"
+            get_library_list
             return 1
         fi
         if [ "$arg" == "--clear-cache" ]; then
@@ -50,6 +54,7 @@ parse_args(){
     done
     return
 }
+
 execute_vlibs(){
     if [ "$#" -eq 0 ] || [ "$1" == ""  ]; then
         echo "Usage: vlibs <lib_name> [arguments]"

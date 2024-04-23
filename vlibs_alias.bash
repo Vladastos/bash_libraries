@@ -16,4 +16,4 @@ function vlibs(){
 	shift
 	execute_vlibs "$library_name" "$@"
 }
-complete -W "$(vlibs -l)" vlibs
+complete -W "$(vlibs --list)" vlibs
