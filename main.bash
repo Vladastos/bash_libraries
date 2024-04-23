@@ -31,11 +31,16 @@ parse_args(){
             echo "Options:"
             echo "  -h, --help          Show this help message"
             echo "  -v, --version       Show the version number"
+            echo "  -l, --list          List all available libraries"
             echo "  --clear-cache       Clear the cache"
             return 1
         fi
         if [ "$arg" == "-v" ] || [ "$arg" == "--version" ]; then
-            echo "Using version 0.0.8"
+            echo "Using version 0.0.9"
+            return 1
+        fi
+        if [ "$arg" == "-l" ] || [ "$arg" == "--list" ]; then
+            echo "hello-world install"
             return 1
         fi
         if [ "$arg" == "--clear-cache" ]; then
@@ -48,6 +53,7 @@ parse_args(){
 execute_vlibs(){
     if [ "$#" -eq 0 ] || [ "$1" == ""  ]; then
         echo "Usage: vlibs <lib_name> [arguments]"
+        return
     fi
     parse_args "$@"
     if [ "$?" -eq 1 ]; then
