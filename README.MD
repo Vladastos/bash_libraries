@@ -26,12 +26,8 @@ For now, the following scripts are available:
 
 ## Install
 
-To install Vlibs, you can manually add the contents of the `vlibs_alias.bash` file to your .bashrc file
-or use the following command:
+To install Vlibs, use the following command:
 
 ```bash
-mkdir -p ~/.config/vlibs
-wget -qO ~/.config/vlibs/vlibs_alias.bash https://raw.githubusercontent.com/Vladastos/vlibs/main/vlibs_alias.bash
-echo "source ~/.config/vlibs/vlibs_alias.bash" >> ~/.bashrc
-source ~/.bashrc
+bash <(curl -s https://raw.githubusercontent.com/Vladastos/vlibs/main/install.bash)
 ```
