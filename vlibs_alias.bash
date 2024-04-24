@@ -16,4 +16,7 @@ function vlibs(){
 	shift
 	execute_vlibs "$library_name" "$@"
 }
-complete -W "$(vlibs --list)" vlibs
+if [ ! -f "$HOME/.cache/vlibs/library_list" ]; then
+	vlibs --list > "$HOME/.cache/vlibs/library_list"
+fi
+complete -W ".cache/vlibs/library_list" vlibs
