@@ -23,9 +23,18 @@ check_if_in_cache_and_execute(){
     "$lib_name" "$@"
 
 }
+
 get_library_list(){
     local library_list="hello-world install"
     echo "$library_list"
+}
+
+uninstall_vlibs(){
+    rm -rf "$HOME"/.cache/vlibs
+    rm -rf "$HOME"/.config/vlibs
+    sed -i '/vlibs/d' ~/.bashrc
+    source ~/.bashrc
+    echo "Uninstalled vlibs"
 }
 
 parse_args(){
@@ -37,10 +46,11 @@ parse_args(){
             echo "  -v, --version       Show the version number"
             echo "  -l, --list          List all available libraries"
             echo "  --clear-cache       Clear the cache"
+            echo "  --uninstall         Uninstall vlibs"
             return 1
         fi
         if [ "$arg" == "-v" ] || [ "$arg" == "--version" ]; then
-            echo "Using version 0.0.9"
+            echo "Using version 0.0.10"
             return 1
         fi
         if [ "$arg" == "-l" ] || [ "$arg" == "--list" ]; then
@@ -49,6 +59,10 @@ parse_args(){
         fi
         if [ "$arg" == "--clear-cache" ]; then
             rm -rf "$HOME"/.cache/vlibs
+            return 1
+        fi
+        if [ "$arg" == "--uninstall" ]; then
+            uninstall_vlibs
             return 1
         fi
     done
