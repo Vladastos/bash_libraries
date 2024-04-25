@@ -55,6 +55,7 @@ parse_args(){
             get_library_list
             return 1
         elif [ "$arg" == "--clear-cache" ]; then
+            echo "Clearing cache..."
             rm -rf "$HOME"/.cache/vlibs
             return 1
         elif [ "$arg" == "--uninstall" ]; then

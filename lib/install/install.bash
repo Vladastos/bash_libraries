@@ -74,12 +74,18 @@ parse_args() {
             return 1
         fi
         if [ "$arg" == "-y" ] || [ "$arg" == "--yes" ]; then
+            echo "Assuming yes for all prompts"
             yes_flag=true
+            shift
         fi
     done
 }
 
 install() {
+    if [ "$#" -eq 0 ] || [ "$1" == ""  ]; then
+        echo "Usage: install [options] [package1 package2 ...]"
+        return
+    fi
     local INSTALL_VERSION="1.0.2"
     local yes_flag=false
     parse_args "$@"
