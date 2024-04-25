@@ -48,22 +48,20 @@ parse_args(){
             echo "  --clear-cache       Clear the cache"
             echo "  --uninstall         Uninstall vlibs"
             return 1
-        fi
-        if [ "$arg" == "-v" ] || [ "$arg" == "--version" ]; then
-            echo "Using version 0.0.10"
+        elif [ "$arg" == "-v" ] || [ "$arg" == "--version" ]; then
+            echo "Using version 0.0.11"
             return 1
-        fi
-        if [ "$arg" == "-l" ] || [ "$arg" == "--list" ]; then
+        elif [ "$arg" == "-l" ] || [ "$arg" == "--list" ]; then
             get_library_list
             return 1
-        fi
-        if [ "$arg" == "--clear-cache" ]; then
+        elif [ "$arg" == "--clear-cache" ]; then
             rm -rf "$HOME"/.cache/vlibs
             return 1
-        fi
-        if [ "$arg" == "--uninstall" ]; then
+        elif [ "$arg" == "--uninstall" ]; then
             uninstall_vlibs
             return 1
+        else
+            return 0
         fi
     done
     return
