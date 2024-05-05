@@ -70,7 +70,7 @@ parse_args(){
 }
 
 execute_vlibs(){
-    local VLIBS_VERSION="0.0.12"
+    local VLIBS_VERSION="0.0.12a"
     if [ "$#" -eq 0 ] || [ "$1" == ""  ]; then
         echo "Usage: vlibs <lib_name> [arguments]"
         return

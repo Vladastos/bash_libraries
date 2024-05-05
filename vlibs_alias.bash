@@ -20,4 +20,4 @@ if [ ! -f "$HOME/.cache/vlibs/library_list" ]; then
 	echo "" > "$HOME/.cache/vlibs/library_list"
 	vlibs --list > "$HOME/.cache/vlibs/library_list"
 fi
-complete -W ".cache/vlibs/library_list" vlibs
+complete -W "$(cat "$HOME/.cache/vlibs/library_list)" vlibs

@@ -18,9 +18,7 @@ detect_package_manager() {
 }
 
 construct_install_command() {
-    if [ "$PACKAGE_MANAGER" == "brew" ]; then
-        INSTALL_COMMAND="brew install"
-    elif [ "$PACKAGE_MANAGER" == "apt" ]; then
+    if [ "$PACKAGE_MANAGER" == "apt" ]; then
         INSTALL_COMMAND="sudo apt install"
         if [ "$yes_flag" == true ]; then
             INSTALL_COMMAND="$INSTALL_COMMAND -y"
@@ -34,6 +32,7 @@ construct_install_command() {
        return "${ERRORS["package_manager_error"]}"
     fi
 }
+
 install_packages() {
     local packages=("$@")
     for package in "${packages[@]}"; do
@@ -55,6 +54,7 @@ install_package() {
     bash -c "$INSTALL_COMMAND $package" || return "${ERRORS["install_packages_error"]}"
     echo "Successfully installed $package."
 }
+
 parse_args() {
     local args=("$@")
     for arg in "${args[@]}"; do
@@ -87,7 +87,6 @@ update_recipe_cache() {
 search_recipe() {
     local package="$1"
     source "$RECIPE_LIST_FILE"
-    echo "${RECIPE_LIST[*]}"
     if [ -z "${RECIPE_LIST[$package]}" ]; then
         return 1
     fi
@@ -98,15 +97,10 @@ use_recipe() {
     local recipe="$1"
     local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/$recipe.recipe.bash"
 
-    source <(curl -fsSL "$RECIPE_URL") || return 1
-
-    echo "Getting ingredients for $recipe..."
-    install_packages "${RECIPE_DEPENDENCIES[@]}" || return 1 
-
     echo "Following recipe for $recipe..."
-    common_recipe
-    "$PACKAGE_MANAGER"_recipe
-
+    bash -c "$(curl -fsSL "$RECIPE_URL")" || return "${ERRORS["install_packages_error"]}"
+    # Try to run the packet manager specific recipe. If it fails, fallback to the common recipe.
+    ${recipe}_${PACKAGE_MANAGER}_recipe || common_recipe
     echo "$recipe has been cooked."
 }
 
@@ -115,12 +109,11 @@ cook() {
         [package_manager_error]='2'
         ["update_recipe_cache_error"]='3'
         ["install_packages_error"]='4'
-
     )
 
     trap 'exit_handler' EXIT
 
-    local COOK_VERSION="1.0.6d"
+    local COOK_VERSION="1.0.7a"
     local PACKAGE_MANAGER
     local CACHE_DIR="$HOME"/.cache/vlibs
     local RECIPE_LIST_FILE="$CACHE_DIR"/cook/recipe_list.bash
