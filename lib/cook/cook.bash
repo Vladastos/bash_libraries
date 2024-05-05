@@ -1,11 +1,17 @@
 #!/bin/bash
 detect_package_manager() {
+    if [ "$PACKAGE_MANAGER" ]; then
+        return
+    fi
     if [ -x "$(command -v apt-get)" ]; then
         PACKAGE_MANAGER="apt-get"
+        return
     elif [ -x "$(command -v apt)" ]; then
         PACKAGE_MANAGER="apt"
+        return
     elif [ -x "$(command -v pacman)" ]; then
         PACKAGE_MANAGER="pacman"
+        return
     else
         PACKAGE_MANAGER="unknown"
     fi
@@ -14,11 +20,6 @@ detect_package_manager() {
 construct_install_command() {
     if [ "$PACKAGE_MANAGER" == "brew" ]; then
         INSTALL_COMMAND="brew install"
-    elif [ "$PACKAGE_MANAGER" == "apt-get" ]; then
-        INSTALL_COMMAND="sudo apt-get install"
-        if [ "$yes_flag" == true ]; then
-            INSTALL_COMMAND="$INSTALL_COMMAND -y"
-        fi
     elif [ "$PACKAGE_MANAGER" == "apt" ]; then
         INSTALL_COMMAND="sudo apt install"
         if [ "$yes_flag" == true ]; then
@@ -35,33 +36,23 @@ construct_install_command() {
         exit 1
     fi
 }
-
 install_packages() {
     local packages=("$@")
     for package in "${packages[@]}"; do
-    echo "Checking if $package is installed..."
+        echo "Checking if $package is installed..."
         if ! command -v "$package" &> /dev/null; then
             # check if there is a recipe available for the package
-            check_recipe "$package" || return
+            check_recipe "$package" | use_recipe "$package" && continue || return 1  
             echo "Installing $package..."
-            if [ "$package" == "brew" ]; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-		        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.bash_profile
-		        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-            elif [ "$package" == "nvim" ]; then
-                install_packages "brew"
-                brew install neovim
-            elif [ "$package" == "startEnv" ]; then
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Vladastos/startEnv/main/setup.bash)"
-            else
-                bash -c "$INSTALL_COMMAND $package"
-
-            fi
-            echo "$package has been installed."
+            bash -c "$INSTALL_COMMAND $package" && {
+                echo "Successfully installed $package."
+            } || return 4
         else
             echo "$package is already installed."
         fi
-    done }
+    done 
+}
+
 
 parse_args() {
     local args=("$@")
@@ -98,41 +89,31 @@ update_recipe_cache() {
 check_recipe() {
     local package="$1"
     source "$RECIPE_LIST_FILE"
-
     if [ -z "${RECIPE_LIST[$package]}" ]; then
-        echo "Recipe not found for $package"
-    else
-        use_recipe "$package"
+        return 1
     fi
+    echo "${RECIPE_LIST[$package]}"
 }
 
 use_recipe() {
-    local package="$1"
-    local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/${RECIPE_LIST[$package]}.recipe.bash"
+    local recipe="$1"
+    local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/${RECIPE_LIST[$recipe]}.recipe.bash"
 
-    source <(curl -fsSL "$RECIPE_URL") || return
-    echo "Using recipe for $package..."
+    source <(curl -fsSL "$RECIPE_URL") || return 1
 
-    echo "Getting ingredients for $package..."
-    install_packages "${RECIPE_DEPENDENCIES[@]}" || return
+    echo "Getting ingredients for $recipe..."
+    install_packages "${RECIPE_DEPENDENCIES[@]}" || return 1 
 
-    echo "Following recipe for $package..."
+    echo "Following recipe for $recipe..."
     common_recipe
-    if [ "$PACKAGE_MANAGER" == "pacman" ]; then
-        pacman_recipe || return
-    elif [ "$PACKAGE_MANAGER" == "apt" ]; then
-        apt_recipe || return
-    elif [ "$PACKAGE_MANAGER" == "apt-get" ]; then
-        apt_recipe || return
-    fi
+    "$PACKAGE_MANAGER"_recipe
 
-    echo "Recipe for $package has been installed."
+    echo "$recipe has been cooked."
 }
 
 cook() {
-    local COOK_VERSION="1.0.6b"
+    local COOK_VERSION="1.0.6d"
     local PACKAGE_MANAGER
-    local OPERATING_SYSTEM
     local CACHE_DIR="$HOME"/.cache/vlibs
     local RECIPE_LIST_FILE="$CACHE_DIR"/cook/recipe_list.bash
     local RECIPE_LIST_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipe_list.bash"
@@ -140,10 +121,20 @@ cook() {
     local yes_flag=true
 
     parse_args "$@" || return 0
-    detect_package_manager
-    construct_install_command || return
-    detect_operating_system
-    update_recipe_cache
-    install_packages "$@"
+    detect_package_manager || {
+        echo "Failed to detect package manager."
+        return 1
+    }
+    construct_install_command || {
+        echo "Failed to construct install command."
+        return 2
+    }
+    update_recipe_cache || {
+        echo "Failed to update recipe cache."
+        return 3
+    }
+    install_packages "$@" || {
+        echo "Failed to install packages."
+        return 4
+    }
 }
-

@@ -1,6 +1,6 @@
 #!/bin/bash
 RECIPE_DEPENDENCIES=(
-    "ciao"
+    "git"
     )
 
 common_recipe(){
