@@ -25,7 +25,7 @@ check_if_in_cache_and_execute(){
 }
 
 get_library_list(){
-    local library_list="hello-world install"
+    local library_list="helo-world cook"
     echo "$library_list"
 }
 

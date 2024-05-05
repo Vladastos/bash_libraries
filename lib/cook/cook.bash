@@ -40,11 +40,15 @@ install_packages() { local packages=("$@")
     for package in "${packages[@]}"; do
     echo "Checking if $package is installed..."
         if ! command -v "$package" &> /dev/null; then
+            # check if there is a recipe available for the package
+            
             echo "Installing $package..."
             if [ "$package" == "brew" ]; then
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+		        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.bash_profile
+		        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
             elif [ "$package" == "nvim" ]; then
-                install_dependencies "brew"
+                install_packages "brew"
                 brew install neovim
             elif [ "$package" == "startEnv" ]; then
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Vladastos/startEnv/main/setup.bash)"
@@ -62,7 +66,7 @@ install_packages() { local packages=("$@")
 parse_args() {
     local args=("$@")
     for arg in "${args[@]}"; do
-        if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]; then
+        if [ "$arg" == "-h" ] || [ "$arg" == "--help" ] || [ -z "$arg" ]; then
             echo "Usage: install [options] [package1 package2 ...]"
             echo "Options:"
             echo "  -h, --help  Show this help message"
@@ -70,7 +74,7 @@ parse_args() {
             return 1
         fi
         if [ "$arg" == "-v" ] || [ "$arg" == "--version" ]; then
-            echo "install version: $INSTALL_VERSION"
+            echo "Using version: $COOK_VERSION"
             return 1
         fi
         if [ "$arg" == "-y" ] || [ "$arg" == "--yes" ]; then
@@ -81,19 +85,24 @@ parse_args() {
     done
 }
 
-install() {
-    if [ "$#" -eq 0 ] || [ "$1" == ""  ]; then
-        echo "Usage: install [options] [package1 package2 ...]"
-        return
-    fi
-    local INSTALL_VERSION="1.0.2"
-    local yes_flag=false
-    parse_args "$@"
-    if [ "$?" == 1 ]; then
-        return
-    fi
+update_recipe_cache() {
+    true
+}
+
+detect_operating_system() {
+    true
+}
+
+cook() {
+    local COOK_VERSION="1.0.3"
+    local PACKAGE_MANAGER
+    local OPERATING_SYSTEM
+    local yes_flag=true
+    parse_args "$@" || return 0
     detect_package_manager
-    construct_install_command
+    construct_install_command || return
+    detect_operating_system
+    update_recipe_cache
     install_packages "$@"
 }
 
