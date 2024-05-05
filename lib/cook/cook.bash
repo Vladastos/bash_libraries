@@ -103,7 +103,7 @@ use_recipe() {
 
     echo "Getting ingredients for $recipe..."
     install_packages "${RECIPE_DEPENDENCIES[@]}" || return 1 
-    
+
     echo "Following recipe for $recipe..."
     common_recipe
     "$PACKAGE_MANAGER"_recipe
