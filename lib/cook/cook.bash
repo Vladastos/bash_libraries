@@ -36,7 +36,8 @@ construct_install_command() {
     fi
 }
 
-install_packages() { local packages=("$@")
+install_packages() {
+    local packages=("$@")
     for package in "${packages[@]}"; do
     echo "Checking if $package is installed..."
         if ! command -v "$package" &> /dev/null; then
@@ -85,10 +86,6 @@ parse_args() {
 }
 
 update_recipe_cache() {
-    local CACHE_DIR="$HOME"/.cache/vlibs
-    local RECIPE_LIST_FILE="$CACHE_DIR"/recipe_list.bash
-    local RECIPE_LIST_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipe_list.bash"
-
     echo "Updating recipe cache..."
 
     if [ ! -d "$CACHE_DIR" ]; then
@@ -99,7 +96,24 @@ update_recipe_cache() {
 }
 
 check_recipe() {
-    true
+    local package="$1"
+    source "$RECIPE_LIST_FILE"
+
+    if [ -z "${RECIPE_LIST[$package]}" ]; then
+        echo "No recipe available for $package."
+        return
+    else
+        echo "Recipe available for $package: ${RECIPE_LIST[$package]}"
+        use_recipe "$package"
+    fi
+}
+
+use_recipe() {
+    local package="$1"
+    local RECIPE_FILE="$CACHE_DIR"/cook/recipes/"${RECIPE_LIST[$package]}".recipe.bash
+    local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/${RECIPE_LIST[$package]}.recipe.bash"
+
+    bash -c "$(curl -fsSL "$RECIPE_URL")" "$PACKAGE_MANAGER"
 }
 
 detect_operating_system() {
@@ -107,10 +121,15 @@ detect_operating_system() {
 }
 
 cook() {
-    local COOK_VERSION="1.0.4"
+    local COOK_VERSION="1.0.5"
     local PACKAGE_MANAGER
     local OPERATING_SYSTEM
+    local CACHE_DIR="$HOME"/.cache/vlibs
+    local RECIPE_LIST_FILE="$CACHE_DIR"/cook/recipe_list.bash
+    local RECIPE_LIST_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipe_list.bash"
+
     local yes_flag=true
+
     parse_args "$@" || return 0
     detect_package_manager
     construct_install_command || return

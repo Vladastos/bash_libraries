@@ -6,7 +6,7 @@ check_if_in_cache_and_execute(){
     local lib_name="$1"
     shift
     local lib_remote_path=https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/$lib_name/$lib_name.bash
-    local lib_path="$CACHE_DIR"/"$lib_name".bash
+    local lib_path="$CACHE_DIR"/"$lib_name"/"$lib_name".bash
     if [ ! -f "$lib_path" ]; then
         #if not in cache download
         if ! wget -q --spider "$lib_remote_path" &>/dev/null; then
@@ -14,6 +14,7 @@ check_if_in_cache_and_execute(){
             return 1
         fi
         echo "Caching library: $lib_name"
+        mkdir -p "$CACHE_DIR"/"$lib_name"
         touch "$lib_path"
         wget -qO "$lib_path" "$lib_remote_path"
     fi
