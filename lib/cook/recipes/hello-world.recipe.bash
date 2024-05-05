@@ -1,4 +1,8 @@
 #!/bin/bash
+RECIPE_DEPENDENCIES=(
+    "ciao"
+    )
+
 common_recipe(){
     echo "Hello World!"
 }

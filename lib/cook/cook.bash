@@ -110,19 +110,27 @@ use_recipe() {
     local package="$1"
     local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/${RECIPE_LIST[$package]}.recipe.bash"
 
+    source <(curl -fsSL "$RECIPE_URL") || return
     echo "Using recipe for $package..."
-    source <(bash -c "$(curl -fsSL "$RECIPE_URL")")
-    
-    common_recipe   
+
+    echo "Getting ingredients for $package..."
+    install_packages "${RECIPE_DEPENDENCIES[@]}" || return
+
+    echo "Following recipe for $package..."
+    common_recipe
+    if [ "$PACKAGE_MANAGER" == "pacman" ]; then
+        pacman_recipe || return
+    elif [ "$PACKAGE_MANAGER" == "apt" ]; then
+        apt_recipe || return
+    elif [ "$PACKAGE_MANAGER" == "apt-get" ]; then
+        apt_recipe || return
+    fi
+
     echo "Recipe for $package has been installed."
 }
 
-detect_operating_system() {
-    true
-}
-
 cook() {
-    local COOK_VERSION="1.0.6a"
+    local COOK_VERSION="1.0.6b"
     local PACKAGE_MANAGER
     local OPERATING_SYSTEM
     local CACHE_DIR="$HOME"/.cache/vlibs
