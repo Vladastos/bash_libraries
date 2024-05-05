@@ -49,7 +49,7 @@ parse_args(){
             echo "  --uninstall         Uninstall vlibs"
             return 1
         elif [ "$arg" == "-v" ] || [ "$arg" == "--version" ]; then
-            echo "Using version 0.0.11"
+            echo "Using version $VLIBS_VERSION"
             return 1
         elif [ "$arg" == "-l" ] || [ "$arg" == "--list" ]; then
             get_library_list
@@ -69,6 +69,7 @@ parse_args(){
 }
 
 execute_vlibs(){
+    local VLIBS_VERSION="0.0.12"
     if [ "$#" -eq 0 ] || [ "$1" == ""  ]; then
         echo "Usage: vlibs <lib_name> [arguments]"
         return
