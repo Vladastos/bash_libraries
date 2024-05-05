@@ -8,15 +8,4 @@ apt_recipe(){
 pacman_recipe(){
     echo "Pacman"
 }
-
-main(){
-
-    common_recipe
-    if [ "$1" == "Pacman" ]; then
-        apt_recipe
-    elif [ "$1" == "Apt" ]; then
-        apt_recipe
-    fi
-
-}
-
+export -f common_recipe apt_recipe pacman_recipe

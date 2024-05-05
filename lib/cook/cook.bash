@@ -42,7 +42,7 @@ install_packages() {
     echo "Checking if $package is installed..."
         if ! command -v "$package" &> /dev/null; then
             # check if there is a recipe available for the package
-            check_recipe "$package"   
+            check_recipe "$package" || return
             echo "Installing $package..."
             if [ "$package" == "brew" ]; then
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -100,20 +100,21 @@ check_recipe() {
     source "$RECIPE_LIST_FILE"
 
     if [ -z "${RECIPE_LIST[$package]}" ]; then
-        echo "No recipe available for $package."
-        return
+        echo "Recipe not found for $package"
     else
-        echo "Recipe available for $package: ${RECIPE_LIST[$package]}"
         use_recipe "$package"
     fi
 }
 
 use_recipe() {
     local package="$1"
-    local RECIPE_FILE="$CACHE_DIR"/cook/recipes/"${RECIPE_LIST[$package]}".recipe.bash
     local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/${RECIPE_LIST[$package]}.recipe.bash"
 
-    bash -c "$(curl -fsSL "$RECIPE_URL")" "$PACKAGE_MANAGER"
+    echo "Using recipe for $package..."
+    source <(bash -c "$(curl -fsSL "$RECIPE_URL")")
+    
+    common_recipe   
+    echo "Recipe for $package has been installed."
 }
 
 detect_operating_system() {
@@ -121,7 +122,7 @@ detect_operating_system() {
 }
 
 cook() {
-    local COOK_VERSION="1.0.5"
+    local COOK_VERSION="1.0.6a"
     local PACKAGE_MANAGER
     local OPERATING_SYSTEM
     local CACHE_DIR="$HOME"/.cache/vlibs
