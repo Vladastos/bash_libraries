@@ -112,7 +112,7 @@ use_recipe() {
 }
 
 cook() {
-    local COOK_VERSION="1.0.6d"
+    local COOK_VERSION="1.0.6e"
     local PACKAGE_MANAGER
     local CACHE_DIR="$HOME"/.cache/vlibs
     local RECIPE_LIST_FILE="$CACHE_DIR"/cook/recipe_list.bash

@@ -1,9 +1,10 @@
 #!/bin/bash
-RECIPE_DEPENDENCIES=(
-    "git"
-    )
 
 common_recipe(){
+    local COMMON_INGREDIENTS=(
+        "git"
+    )
+    install_packages "${COMMON_INGREDIENTS[@]}"
     echo "Hello World!"
 }
 apt_recipe(){
