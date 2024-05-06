@@ -95,6 +95,14 @@ search_recipe() {
 
 use_recipe() {
     # Create a subshell and source the recipe, then follow the recipe
+    # The recipe should define the following variables:
+    #  - COMMON_INGREDIENTS - An array of dependencies that will be installed with any package manager (Required)
+    #  - ${PACKAGE_MANAGER}_INGREDIENTS - An array of dependencies that will be installed with the given package manager (Optional)
+    #
+    #   The recipe should define the following functions:
+    #  - common_recipe - A function that will be called if no package manager is detected (Required)
+    #  - ${PACKAGE_MANAGER}_recipe - A function that will be called if the given package manager is detected (Optional)
+    #
     local recipe="$1"
     echo "Using recipe: $recipe"
     (
@@ -122,12 +130,12 @@ install() {
 
     trap 'exit_handler' EXIT
 
-    local INSTALL_VERSION="1.0.7c5"
+    local INSTALL_VERSION="1.0.8"
     local PACKAGE_MANAGER
     local CACHE_DIR="$HOME"/.cache/vlibs
     local REMOTE_INSTALL_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/install"
     local RECIPE_LIST_FILE="$CACHE_DIR"/install/recipe_list.bash
-    local RECIPE_LIST_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/install/recipe_list.bash"
+    local RECIPE_LIST_URL="$REMOTE_INSTALL_URL/recipe_list.bash"
 
     local yes_flag=true
 

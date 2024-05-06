@@ -1,3 +1,4 @@
+#!/bin/bash
 declare -A RECIPE_LIST=(
     ["hello-world"]="hello-world"
     ["nvim"]="neovim"

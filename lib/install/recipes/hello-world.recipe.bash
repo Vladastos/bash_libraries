@@ -1,4 +1,6 @@
 #!/bin/bash
+#This is a recipe.
+#It is used to test the install script.
 COMMON_INGREDIENTS=(
     "git"
 )

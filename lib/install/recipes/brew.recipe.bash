@@ -21,17 +21,5 @@ install_brew() {
 }
 
 common_recipe(){
-    install_packages "${COMMON_INGREDIENTS[@]}"
     install_brew
 }
-
-apt_recipe(){
-    install_packages "${APT_INGREDIENTS[@]}"
-    common_recipe
-}
-
-pacman_recipe(){
-    install_packages "${PACMAN_INGREDIENTS[@]}"
-    common_recipe
-}
-

@@ -4,6 +4,7 @@ local COMMON_INGREDIENTS=(
     "brew"
     )
 neovim_common_recipe(){
-    install_packages "${COMMON_INGREDIENTS[@]}"
-    brew install neovim
+    if ! command -v nvim &> /dev/null; then
+        brew install neovim
+    fi
 }
