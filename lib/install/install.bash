@@ -90,37 +90,39 @@ search_recipe() {
     if [ -z "${RECIPE_LIST[$package]}" ]; then
         return 1
     fi
-    export -f use_recipe
-    # Export the function so that it can be used in the recipe, then execute it
-    bash -c "$(curl -fsSL "$REMOTE_INSTALL_URL/recipes/${RECIPE_LIST[$package]}.recipe.bash") ${RECIPE_LIST[$package]}"
+    use_recipe "${RECIPE_LIST[$package]}"
 }
 
-#This function is exported to the recipe and will be executed from there
 use_recipe() {
+    # Create a subshell and source the recipe, then follow the recipe
     local recipe="$1"
     echo "Using recipe: $recipe"
-    install_packages "$COMMON_INGREDIENTS[@]"
-
-    if [ "$PACKAGE_MANAGER" == "apt" ]; then
-        install_packages "${APT_INGREDIENTS[@]}"
-        pacman_recipe
-    elif [ "$PACKAGE_MANAGER" == "pacman" ]; then
-        install_packages "${PACMAN_INGREDIENTS[@]}"
-        apt_recipe
-    fi
-
+    (
+        source <(curl -fsSL "$REMOTE_INSTALL_URL/recipes/$recipe.recipe.bash")
+        install_packages "${COMMON_INGREDIENTS[@]}"
+        if [ "$PACKAGE_MANAGER" == "apt" ]; then
+            install_packages "${APT_INGREDIENTS[@]}"
+        elif [ "$PACKAGE_MANAGER" == "pacman" ]; then
+            install_packages "${PACMAN_INGREDIENTS[@]}"
+        fi
+        if type -t "$1"_"$PACKAGE_MANAGER"_recipe &> /dev/null; then
+            "$1"_"$PACKAGE_MANAGER"_recipe
+        else
+            "$1"_common_recipe
+        fi
+    )
 }
 
 install() {
     declare -A ERRORS=(
-        [package_manager_error]='2'
+        ["package_manager_error"]='2'
         ["update_recipe_cache_error"]='3'
         ["install_packages_error"]='4'
     )
 
     trap 'exit_handler' EXIT
 
-    local INSTALL_VERSION="1.0.7c4"
+    local INSTALL_VERSION="1.0.7c5"
     local PACKAGE_MANAGER
     local CACHE_DIR="$HOME"/.cache/vlibs
     local REMOTE_INSTALL_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/install"
