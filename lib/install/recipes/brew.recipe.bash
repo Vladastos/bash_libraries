@@ -35,4 +35,3 @@ pacman_recipe(){
     common_recipe
 }
 
-export -f pacman_recipe apt_recipe

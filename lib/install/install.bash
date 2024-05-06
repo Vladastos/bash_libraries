@@ -98,13 +98,13 @@ use_recipe() {
     local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/$recipe.recipe.bash"
 
     echo "Following recipe for $recipe..."
-    bash -c "$(curl -fsSL "$RECIPE_URL")" || return "${ERRORS["install_packages_error"]}"
+    source "$(curl -fsSL "$RECIPE_URL")" || return "${ERRORS["install_packages_error"]}"
     # Try to run the packet manager specific recipe. If it fails, fallback to the common recipe.
     ${recipe}_${PACKAGE_MANAGER}_recipe || common_recipe
     echo "$recipe has been cooked."
 }
 
-cook() {
+install() {
     declare -A ERRORS=(
         [package_manager_error]='2'
         ["update_recipe_cache_error"]='3'
@@ -116,8 +116,8 @@ cook() {
     local COOK_VERSION="1.0.7a"
     local PACKAGE_MANAGER
     local CACHE_DIR="$HOME"/.cache/vlibs
-    local RECIPE_LIST_FILE="$CACHE_DIR"/cook/recipe_list.bash
-    local RECIPE_LIST_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipe_list.bash"
+    local RECIPE_LIST_FILE="$CACHE_DIR"/install/recipe_list.bash
+    local RECIPE_LIST_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/install/recipe_list.bash"
 
     local yes_flag=true
 
