@@ -95,9 +95,20 @@ search_recipe() {
     bash -c "$(curl -fsSL "$REMOTE_INSTALL_URL/recipes/${RECIPE_LIST[$package]}.recipe.bash") ${RECIPE_LIST[$package]}"
 }
 
+#This function is exported to the recipe and will be executed from there
 use_recipe() {
     local recipe="$1"
-    echo "$recipe is cooking..."
+    echo "Using recipe: $recipe"
+    install_packages "$COMMON_INGREDIENTS[@]"
+
+    if [ "$PACKAGE_MANAGER" == "apt" ]; then
+        install_packages "${APT_INGREDIENTS[@]}"
+        pacman_recipe
+    elif [ "$PACKAGE_MANAGER" == "pacman" ]; then
+        install_packages "${PACMAN_INGREDIENTS[@]}"
+        apt_recipe
+    fi
+
 }
 
 install() {
@@ -109,7 +120,7 @@ install() {
 
     trap 'exit_handler' EXIT
 
-    local INSTALL_VERSION="1.0.7c2"
+    local INSTALL_VERSION="1.0.7c4"
     local PACKAGE_MANAGER
     local CACHE_DIR="$HOME"/.cache/vlibs
     local REMOTE_INSTALL_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/install"
