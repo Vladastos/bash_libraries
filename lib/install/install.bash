@@ -66,7 +66,7 @@ parse_args() {
             return 1
         fi
         if [ "$arg" == "-v" ] || [ "$arg" == "--version" ]; then
-            echo "Using version: $COOK_VERSION"
+            echo "Using version: $INSTALL_VERSION"
             return 1
         fi
         if [ "$arg" == "-y" ] || [ "$arg" == "--yes" ]; then
@@ -90,18 +90,14 @@ search_recipe() {
     if [ -z "${RECIPE_LIST[$package]}" ]; then
         return 1
     fi
-    use_recipe "${RECIPE_LIST[$package]}"
+    export -f use_recipe
+    # Export the function so that it can be used in the recipe, then execute it
+    bash -c "$(curl -fsSL "$REMOTE_INSTALL_URL/recipes/${RECIPE_LIST[$package]}.recipe.bash") ${RECIPE_LIST[$package]}"
 }
 
 use_recipe() {
     local recipe="$1"
-    local RECIPE_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/cook/recipes/$recipe.recipe.bash"
-
-    echo "Following recipe for $recipe..."
-    source "$(curl -fsSL "$RECIPE_URL")" || return "${ERRORS["install_packages_error"]}"
-    # Try to run the packet manager specific recipe. If it fails, fallback to the common recipe.
-    ${recipe}_${PACKAGE_MANAGER}_recipe || common_recipe
-    echo "$recipe has been cooked."
+    echo "$recipe is cooking..."
 }
 
 install() {
@@ -113,9 +109,10 @@ install() {
 
     trap 'exit_handler' EXIT
 
-    local COOK_VERSION="1.0.7a"
+    local INSTALL_VERSION="1.0.7c2"
     local PACKAGE_MANAGER
     local CACHE_DIR="$HOME"/.cache/vlibs
+    local REMOTE_INSTALL_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/install"
     local RECIPE_LIST_FILE="$CACHE_DIR"/install/recipe_list.bash
     local RECIPE_LIST_URL="https://raw.githubusercontent.com/Vladastos/vlibs/main/lib/install/recipe_list.bash"
 

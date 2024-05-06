@@ -13,3 +13,4 @@ hello-world_pacman_recipe(){
     echo "You are using Pacman"
 }
 
+use_recipe $@
