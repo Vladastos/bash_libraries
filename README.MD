@@ -22,7 +22,7 @@ For now, the following scripts are available:
 
 - [hello-world](lib/hello-world/hello-world.bash)
  This script simply prints "Hello World" and prints any parameters passed to it.
-- [install](lib/install/install.bash) Installs any passed dependencies using the appropriate package manager.
+- [cook](lib/cook/cook.bash) Installs any passed dependencies using the appropriate package manager.
 
 ## Install
 

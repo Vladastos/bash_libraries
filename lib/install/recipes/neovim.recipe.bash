@@ -1,5 +1,5 @@
 #!/bin/bash
-local COMMON_INGREDIENTS=(
+COMMON_INGREDIENTS=(
     "git"
     "brew"
     )

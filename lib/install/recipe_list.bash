@@ -4,4 +4,5 @@ declare -A RECIPE_LIST=(
     ["nvim"]="neovim"
     ["neovim"]="neovim"
     ["brew"]="brew"
+    ["promptorium"]="promptorium"
 )
